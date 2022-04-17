@@ -1,4 +1,9 @@
 // #define ARDUINOOSC_DEBUGLOG_ENABLE
+//
+#include <FastLED.h>
+#define NUM_LEDS 1
+#define DATA_PIN 18
+CRGB leds[NUM_LEDS];
 
 // Please include ArduinoOSCWiFi.h to use ArduinoOSC on the platform
 // which can use both WiFi and Ethernet
@@ -7,8 +12,8 @@
 // #include <ArduinoOSC.h>
 
 // WiFi stuff
-const char* ssid = "House of Linden 2.4GHz";
-const char* pwd = "3uZZ3uZZ";
+const char* ssid = "xxxx";
+const char* pwd = "xxxx";
 const IPAddress ip(192, 168, 1, 250);
 const IPAddress gateway(192, 168, 1, 1);
 const IPAddress subnet(255, 255, 255, 0);
@@ -17,11 +22,14 @@ const IPAddress subnet(255, 255, 255, 0);
 const char* host = "192.168.1.134";
 const int send_port = 10000;
 const int publish_port = 10000;
-// send / receive varibales
 int analogVal;
 
 void setup() {
+    FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_LEDS);
     Serial.begin(115200);
+    Serial.println("Starting...");
+    startupBlink();
+    setLED(CRGB::Yellow);
     delay(2000);
 
     // WiFi stuff (no timeout setting for WiFi)
@@ -38,6 +46,7 @@ void setup() {
     }
     Serial.print("WiFi connected, IP = ");
     Serial.println(WiFi.localIP());
+    setLED(CRGB::Green);
 
     // publish osc messages (default publish rate = 30 [Hz])
 
@@ -51,5 +60,20 @@ void setup() {
 
 void loop() {
    OscWiFi.update();  // should be called to receive + send osc
-   analogVal = analogRead(34);
+   analogVal = analogRead(32);
 }
+
+void setLED(CRGB color) {
+  leds[0] = color;
+  FastLED.show();
+}
+
+void startupBlink() {
+  for(int i=0; i<3; i++) {
+      setLED(CRGB::Purple);
+      delay(200);
+      setLED(CRGB::Black);
+      delay(200);
+  }
+}
+
